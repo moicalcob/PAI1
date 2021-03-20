@@ -1,5 +1,6 @@
 import socket
 import sys
+import json
 
 
 def get_constants(prefix):
@@ -24,10 +25,17 @@ print()
 
 try:
 
+    data = {
+        'file': '/var/www/html',
+        'hash': 'asdfasdfasdfas',
+        'token': 123123
+    }
+    result = json.dumps(data)
+
     # Send data
     message = b'This is the message.  It will be repeated.'
     print('sending {!r}'.format(message))
-    sock.sendall(message)
+    sock.sendall(result)
 
     amount_received = 0
     amount_expected = len(message)
