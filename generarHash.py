@@ -21,7 +21,6 @@ root = "/Users/moises/Downloads" # it may have many subfolders and files inside
 
 ##BASES DE DATOS ##
 
-
 def create_table():
     c.execute("CREATE TABLE IF NOT EXISTS ficheros(nombre TEXT, hash TEXT, fecha TEXT)")
 
@@ -48,7 +47,7 @@ def cogerHash(nombre,hash):
 def explorarDirectorios():
     lst = []
     pattern = "*.*"        # Note: Use this pattern to get all types of files and folders 
-    for path, subdirs, files in os.walk(pathTemp):
+    for path, subdirs, files in os.walk(root):
         for name in files:
             if fnmatch(name, pattern):
                 lst.append((os.path.join(path, name)))
