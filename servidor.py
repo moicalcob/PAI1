@@ -12,14 +12,14 @@ import sys,os
 import csv
 from django.template.defaultfilters import length
 
-from utils import explorar_directorios_server, create_table, drop_database, extraer_hash
+from utils import explorar_directorios_server, create_table, drop_database, extraer_hash, generate_mac
 
-root = '/Users/moises/Downloads'
+root = '/Users/moises/Downloads/prueba'
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to the port
-server_address = ('localhost', 10000)
+server_address = ('localhost', 10001)
 print('Inciando servidor en {} puerto {}'.format(*server_address))
 sock.bind(server_address)
 # Listen for incoming connections
@@ -37,20 +37,25 @@ print()
 while True:
     print('Esperando conexión')
     connection, client_address = sock.accept()
-    try:
-        print('Conexión recibida desde', client_address)
-        # Receive the data in small chunks and retransmit it
-        while True:
-            data = connection.recv(1024)
-            if data:
-                info = json.loads(data)
-                datos = extraer_hash(data['file'], data['hash'], c)
-                print(datos)
-                connection.sendall(data)
+    print('Conexión recibida desde', client_address)
+    # Receive the data in small chunks and retransmit it
+    while True:
+        data = connection.recv(1024)
+        if data:
+            info = json.loads(data)
+            datos = extraer_hash(info['file'], info['hash'], c)
+            if(datos == "NO SE HA ENCONTRADO EL ARCHIVO SOLICITADO"):
+                connection.sendall("VERIFICATION_HASH_FAIL".encode())
             else:
-                print('No se han recibido datos', client_address)
-                break
-    finally:
-        # Clean up the connection
-        connection.close()
-        conn.close()
+                print("VERIFICACIÓN CORRECTA DEL ARCHIVO: " + datos[0])
+                mac = generate_mac(info['token'], info['file'], info['hash'])
+                response = {
+                    'hash': datos[1],
+                    'mac': mac,
+                    'status': 'VERIFICATION_HASH_OK'
+                }
+                encoded_response = json.dumps(response).encode()
+                connection.sendall(encoded_response)
+        else:
+            print('No se han recibido datos', client_address)
+            break
