@@ -47,7 +47,7 @@ def cogerHash(nombre,hash):
 def explorarDirectorios():
     lst = []
     pattern = "*.*"        # Note: Use this pattern to get all types of files and folders 
-    for path, subdirs, files in os.walk(root):
+    for path, subdirs, files in os.walk(pathTemp):
         for name in files:
             if fnmatch(name, pattern):
                 lst.append((os.path.join(path, name)))

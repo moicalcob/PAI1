@@ -14,7 +14,8 @@ from django.template.defaultfilters import length
 
 from utils import explorar_directorios_server, create_table, drop_database, extraer_hash, generate_mac
 
-root = '/Users/moises/Downloads/prueba'
+root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
+#root = '/Users/moises/Downloads/prueba'
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -24,11 +25,14 @@ print('Inciando servidor en {} puerto {}'.format(*server_address))
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
-
+os.remove('database.db')
+print('He borrado el archivo de bases de datos antiguo')
 conn = sqlite3.connect('database.db')
+print('Me he conectado a Base de Datos')
 c = conn.cursor()
-drop_database(c)
+#drop_database(c)
 create_table(c)
+print('He creado la Tabla en Base de Datos')
 print('Indexando archivos y generando hashes')
 explorar_directorios_server(root, c, conn)
 print()
@@ -44,10 +48,18 @@ while True:
         if data:
             info = json.loads(data)
             datos = extraer_hash(info['file'], info['hash'], c)
-            if(datos == "NO SE HA ENCONTRADO EL ARCHIVO SOLICITADO"):
-                connection.sendall("VERIFICATION_HASH_FAIL".encode())
+            #print(datos)
+            if(len(datos) > 3):
+                response = {
+                    'hash': '',
+                    'mac': '',
+                    'status':'VERIFICATION_HASH_FAIL'
+                }
+                encoded_response = json.dumps(response).encode()
+                #print(encoded_response)
+                connection.sendall(encoded_response)
             else:
-                print("VERIFICACIÓN CORRECTA DEL ARCHIVO: " + datos[0])
+                #print("VERIFICACIÓN CORRECTA DEL ARCHIVO: " + datos[0])
                 mac = generate_mac(info['token'], info['file'], info['hash'])
                 response = {
                     'hash': datos[1],

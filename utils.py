@@ -24,6 +24,17 @@ def challenge(i, b):
         resultado = resultado + i
     return str(resultado)
 
+def explorar_directorios_cliente(root):
+    print('He entrado a indexar espera un segundo.')
+    lst = []
+    pattern = "*.*"        # Note: Use this pattern to get all types of files and folders 
+    for path, subdirs, files in os.walk(root):
+        for name in files:
+            if fnmatch(name, pattern):
+                absolute_path = os.path.join(path,name)
+                lst.append(absolute_path)
+    return lst
+
 def generate_mac(token, file, hash):
     challenge_result = challenge(token, 4)
     mac_to_generate = hash + file + challenge_result
@@ -31,18 +42,22 @@ def generate_mac(token, file, hash):
     sha256.update(mac_to_generate.encode())
     return sha256.hexdigest()
 
-def generate_hash_file(file):
+def generate_hashes_client(file_list):    
+    data = {}
     try:
         sha256 = hashlib.sha256()
-        with open(file, "rb") as f:
-            for bloque in iter(lambda: f.read(65536), b""):
-                sha256.update(bloque)
-        return sha256.hexdigest()
-    except Exception as e:
-        print("ERROR: %s" % (e))
+        for file in file_list: 
+            with open(file, "rb") as f:
+                for bloque in iter(lambda: f.read(65536), b""):
+                    sha256.update(bloque)
+            data[file] = sha256.hexdigest()
+        return data
+    except Exception as e: 
+        print ("ERROR: %s" % (e))
         return ""
-    except:
-        print("Error desconocido")
+    except: 
+        print("Error desconocido")   
+
 
 
 # ------------ SERVIDOR --------------- #
@@ -71,8 +86,9 @@ def extraer_hash(nombre,hash, cursor):
            return r
 
 def explorar_directorios_server(root, cursor, conn):
+    print('He entrado a indexar espera un segundo.')
     lst = []
-    pattern = "*.*"        # Note: Use this pattern to get all types of files and folders 
+    pattern = "*.*"        
     for path, subdirs, files in os.walk(root):
         for name in files:
             if fnmatch(name, pattern):
