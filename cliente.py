@@ -34,7 +34,7 @@ families = get_constants('AF_')
 types = get_constants('SOCK_')
 protocols = get_constants('IPPROTO_')
 # root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
-root = '/Users/moises/Downloads/prueba'
+root = '/Users/moises/Downloads/prueba/prueba1'
 token = 1233224242
 
 
@@ -72,9 +72,9 @@ def cargar_cliente():
                 print('INTEGRITY_FILE_OK')
             else:
                 print('INTEGRITY_FILE_FAIL')
-                errores = errores + 1
-                if(response['file'] not in archivos_corruptos):
-                    archivos_corruptos.append(response['file'])
+                # errores = errores + 1
+                # if(response['file'] not in archivos_corruptos):
+                #     archivos_corruptos.append(response['file'])
 
     print('Porcentaje de integridad aciertos->',
           porcentaje_integridad(len(datos), aciertos), '%')
@@ -116,9 +116,9 @@ def generar_informe_mensual():
 
 schedule.every().day.at("10:30").do(cargar_cliente)
 schedule.every(30).days.at("10:30").do(generar_informe_mensual)
-schedule.every(20).seconds.do(cargar_cliente)
+schedule.every(10).seconds.do(cargar_cliente)
 
-schedule.every(50).seconds.do(generar_informe_mensual)
+schedule.every(300).seconds.do(generar_informe_mensual)
 
 while True:
     schedule.run_pending()

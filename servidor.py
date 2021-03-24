@@ -15,7 +15,7 @@ from django.template.defaultfilters import length
 from utils import explorar_directorios_server, create_table, drop_database, extraer_hash, generate_mac
 
 # root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
-root = '/Users/moises/Downloads/prueba'
+root = '/Users/moises/Downloads/prueba/prueba1'
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,6 +47,8 @@ while True:
         data = connection.recv(1024)
         if data:
             info = json.loads(data)
+            print(info['file'])
+            print(info['hash'])
             datos = extraer_hash(info['file'], info['hash'], c)
             #print(datos)
             if(len(datos) > 3):
