@@ -34,7 +34,7 @@ families = get_constants('AF_')
 types = get_constants('SOCK_')
 protocols = get_constants('IPPROTO_')
 # root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
-root = '/Users/moises/Downloads/prueba/prueba1'
+root = '/Users/moises/Downloads/prueba'
 token = 1233224242
 
 
@@ -72,9 +72,9 @@ def cargar_cliente():
                 print('INTEGRITY_FILE_OK')
             else:
                 print('INTEGRITY_FILE_FAIL')
-                # errores = errores + 1
-                # if(response['file'] not in archivos_corruptos):
-                #     archivos_corruptos.append(response['file'])
+                errores = errores + 1
+                if(response['file'] not in archivos_corruptos):
+                    archivos_corruptos.append(response['file'])
 
     print('Porcentaje de integridad aciertos->',
           porcentaje_integridad(len(datos), aciertos), '%')
@@ -85,11 +85,11 @@ def cargar_cliente():
 
     archivos_corruptos_informe = ''
     for file in archivos_corruptos:
-        archivos_corruptos_informe = archivos_corruptos_informe + " " + file
+        archivos_corruptos_informe = archivos_corruptos_informe + " \n " + file
     csv_content = []
     csv_content.append([str(datetime.now()), str(porcentaje_integridad(len(
         datos), aciertos)) + '%', str(porcentaje_errores(len(datos), errores)) + '%', archivos_corruptos_informe])
-    with open('Informe_mensual.csv', 'w', newline='') as file:
+    with open('Informe_mensual.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(csv_content)
 
@@ -112,13 +112,14 @@ def generar_informe_mensual():
     df.to_csv(filename, header=[
         'Fecha y hora', 'Porcentaje de integridad aciertos', 'Porcentaje de integridad archivos', 'Archivos erróneos'])
     os.remove("./Informe_mensual.csv")
+    print('INFORME MENSUAL GENERADO')
 
 
 schedule.every().day.at("10:30").do(cargar_cliente)
 schedule.every(30).days.at("10:30").do(generar_informe_mensual)
-schedule.every(10).seconds.do(cargar_cliente)
 
-schedule.every(300).seconds.do(generar_informe_mensual)
+schedule.every(10).seconds.do(cargar_cliente)
+schedule.every(35).seconds.do(generar_informe_mensual)
 
 while True:
     schedule.run_pending()

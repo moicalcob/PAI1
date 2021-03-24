@@ -47,8 +47,6 @@ while True:
         data = connection.recv(1024)
         if data:
             info = json.loads(data)
-            print(info['file'])
-            print(info['hash'])
             datos = extraer_hash(info['file'], info['hash'], c)
             #print(datos)
             if(len(datos) > 3):
