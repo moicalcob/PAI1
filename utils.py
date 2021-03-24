@@ -65,7 +65,7 @@ def drop_database(cursor):
     cursor.execute("DROP TABLE IF EXISTS ficheros")
 
 def create_table(cursor):
-    cursor.execute("CREATE TABLE IF NOT EXISTS ficheros(nombre TEXT, hash TEXT, fecha TEXT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS ficheros(nombre TEXT PRIMARY KEY, hash TEXT, fecha TEXT)")
 
 def insert_data_server(nombre, hash, cursor, conn):
     fecha = datetime.now()

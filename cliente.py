@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import socket
 import json
 import hashlib
@@ -16,8 +17,9 @@ from fnmatch import fnmatch
 import codecs
 import schedule
 import time
+import pandas as pd
 
-from utils import generate_mac,explorar_directorios_cliente,generate_hashes_client
+from utils import generate_mac, explorar_directorios_cliente, generate_hashes_client
 
 
 def get_constants(prefix):
@@ -31,11 +33,12 @@ def get_constants(prefix):
 families = get_constants('AF_')
 types = get_constants('SOCK_')
 protocols = get_constants('IPPROTO_')
-root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
-#root = '/Users/moises/Downloads/prueba'
+# root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
+root = '/Users/moises/Downloads/prueba'
 token = 1233224242
 
-def cargar_cliente():    
+
+def cargar_cliente():
     errores = 0
     aciertos = 0
     archivos_corruptos = []
@@ -51,7 +54,7 @@ def cargar_cliente():
             'hash': datos[file],
             'token': token
         }
-        client_mac = generate_mac(token, file, datos[file]) #Generamos la mac
+        client_mac = generate_mac(token, file, datos[file])  # Generamos la mac
         result = json.dumps(data).encode()
         # Send data
         sock.sendall(result)
@@ -65,31 +68,58 @@ def cargar_cliente():
             errores = errores + 1
         else:
             if client_mac == response['mac']:
-                aciertos = aciertos + 1 
+                aciertos = aciertos + 1
                 print('INTEGRITY_FILE_OK')
             else:
                 print('INTEGRITY_FILE_FAIL')
                 errores = errores + 1
                 if(response['file'] not in archivos_corruptos):
                     archivos_corruptos.append(response['file'])
-    print('Porcentaje de integridad aciertos->', porcentaje_integridad(len(datos),aciertos),'1%')
-    print('Porcentaje de integridad fallos->', porcentaje_errores(len(datos),errores),'%')
-    print('Se han producido ',errores,' fallos de integridad en los archivos: \n')
-    
-    for file in archivos_corruptos: 
-        print('->',file,'\n')
+
+    print('Porcentaje de integridad aciertos->',
+          porcentaje_integridad(len(datos), aciertos), '%')
+    print('Porcentaje de integridad fallos->',
+          porcentaje_errores(len(datos), errores), '%')
+    print('Se han producido ', errores,
+          ' fallos de integridad en los archivos: \n')
+
+    archivos_corruptos_informe = ''
+    for file in archivos_corruptos:
+        archivos_corruptos_informe = archivos_corruptos_informe + " " + file
+    csv_content = []
+    csv_content.append([str(datetime.now()), str(porcentaje_integridad(len(
+        datos), aciertos)) + '%', str(porcentaje_errores(len(datos), errores)) + '%', archivos_corruptos_informe])
+    with open('Informe_mensual.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(csv_content)
+
     print('closing socket')
     sock.close()
 
-def porcentaje_integridad(tamaño,aciertos):
-    return aciertos * 100 / tamaño
-def porcentaje_errores(tamaño,errores):
-    return errores * 100 / tamaño
+
+def porcentaje_integridad(tamanio, aciertos):
+    return aciertos * 100 / tamanio
+
+
+def porcentaje_errores(tamanio, errores):
+    return errores * 100 / tamanio
+
+
+def generar_informe_mensual():
+    df = pd.read_csv('Informe_mensual.csv', header=None)
+    mydate = datetime.now()
+    filename = 'Informe_mensual_' + mydate.strftime('%m_%Y') + ".csv"
+    df.to_csv(filename, header=[
+        'Fecha y hora', 'Porcentaje de integridad aciertos', 'Porcentaje de integridad archivos', 'Archivos erróneos'])
+    os.remove("./Informe_mensual.csv")
+
 
 schedule.every().day.at("10:30").do(cargar_cliente)
-schedule.every(10).seconds.do(cargar_cliente)
+schedule.every(30).days.at("10:30").do(generar_informe_mensual)
+schedule.every(20).seconds.do(cargar_cliente)
+
+schedule.every(50).seconds.do(generar_informe_mensual)
 
 while True:
     schedule.run_pending()
     time.sleep(1)
-

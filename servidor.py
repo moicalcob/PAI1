@@ -14,8 +14,8 @@ from django.template.defaultfilters import length
 
 from utils import explorar_directorios_server, create_table, drop_database, extraer_hash, generate_mac
 
-root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
-#root = '/Users/moises/Downloads/prueba'
+# root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
+root = '/Users/moises/Downloads/prueba'
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
