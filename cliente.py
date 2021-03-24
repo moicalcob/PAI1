@@ -91,6 +91,7 @@ def cargar_cliente():
     csv_content = []
     csv_content.append([str(datetime.now()), str(porcentaje_integridad(len(
         datos), aciertos)) + '%', str(porcentaje_errores(len(datos), errores)) + '%', archivos_corruptos_informe])
+    csv_content.append([str(len(datos)) + ' archivos examinados en total'])
     with open('Informe_mensual.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(csv_content)
@@ -119,9 +120,6 @@ def generar_informe_mensual():
 
 schedule.every().day.at("10:30").do(cargar_cliente)
 schedule.every(30).days.at("10:30").do(generar_informe_mensual)
-
-schedule.every(10).seconds.do(cargar_cliente)
-schedule.every(35).seconds.do(generar_informe_mensual)
 
 while True:
     schedule.run_pending()
