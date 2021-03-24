@@ -33,10 +33,12 @@ def get_constants(prefix):
 families = get_constants('AF_')
 types = get_constants('SOCK_')
 protocols = get_constants('IPPROTO_')
-# root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
-root = '/Users/moises/Downloads/prueba'
+
+root = '/'
 token = 1233224242
 
+if(sys.argv[1]):
+    root = sys.argv[1]
 
 def cargar_cliente():
     errores = 0

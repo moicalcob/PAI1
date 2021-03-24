@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import socket
 import hashlib
 import json
@@ -11,11 +13,13 @@ import sqlite3
 import sys,os
 import csv
 from django.template.defaultfilters import length
-
+import sys
 from utils import explorar_directorios_server, create_table, drop_database, extraer_hash, generate_mac
 
-# root = '/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/INGLES FIRST'
-root = '/Users/moises/Downloads/prueba/prueba1'
+root = '/'
+
+if(sys.argv[1]):
+    root = sys.argv[1]
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,7 +34,6 @@ print('He borrado el archivo de bases de datos antiguo')
 conn = sqlite3.connect('database.db')
 print('Me he conectado a Base de Datos')
 c = conn.cursor()
-#drop_database(c)
 create_table(c)
 print('He creado la Tabla en Base de Datos')
 print('Indexando archivos y generando hashes')
