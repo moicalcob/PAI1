@@ -1,6 +1,9 @@
 package com.st22;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ServerSocketFactory;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,19 +11,28 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Server {
-    public static void main(String[] args) throws IOException {
+   
+	protected static final String SecretKey = "Secreto-ST-22";
+	protected Mac mac_cliente_SHA256;
+	
+	public static void main(String[] args) throws IOException {
         try {
             Server server = new Server();
             server.startServer();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
@@ -32,11 +44,12 @@ public class Server {
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
-    private void startServer() throws IOException, URISyntaxException {
+    private void startServer() throws IOException, URISyntaxException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
         do {
-            System.out.println("Servidor configurado correctamente");
+            System.err.println("Servidor configurado correctamente");
             Socket socket = server.accept();
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            PrintWriter serverOutput = new PrintWriter(outputStream, true);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             // Recibimos el mensaje
@@ -44,42 +57,122 @@ public class Server {
 
             // Recibimos el nonce
             String nonce = bufferedReader.readLine();
-
+            
+            String macMensajeDelCliente = bufferedReader.readLine();
+            
+            
+            //Ahora se debe calcular la MAC por parte del Servidor y ver si es un mensaje integro o no 
+            
+            this.mac_cliente_SHA256 = Mac.getInstance("HmacSHA256");
+            
+            SecretKeySpec key = new SecretKeySpec(SecretKey.getBytes(), "HmacSHA256");
+            this.mac_cliente_SHA256.init(key);
+            
+            String nonceMessage = message.concat(nonce);
+            
+            byte[] nonceMessageByte = nonceMessage.getBytes("UTF-8");
+            
+            byte[] digest = this.mac_cliente_SHA256.doFinal(nonceMessageByte);
+            
+            String macMensajeCalculadoServ = Utiles.bytesToHex(digest);
+            FileReader linesNonce = new FileReader("./nonces.txt");
+            
             //Checkeamos el nonce
-            Boolean nonceValid = nonceIsValid(nonce);
+            Boolean nonceValid = Utiles.nonceIsValid(nonce);
             if (nonceValid) {
-                storeNonce(nonce);
-                System.out.println("Nonce válido");
+                Utiles.storeNonce(nonce);
+                System.out.println("Nonce v�lido");
+                System.out.println("Cifrado hex: "+macMensajeDelCliente);
             } else {
-                messageVerificationFailed(message);
-                System.out.println("Nonce no válido");
+                Utiles.messageVerificationFailed(message);
+                System.out.println("Nonce no v�lido");
             }
+            
+            if(macMensajeDelCliente.equals(macMensajeCalculadoServ) && nonceValid) {
+            	System.out.println("Mensaje enviado integramente");
+            	File fw = new File("./nonces.txt");
+            	BufferedWriter bw = new BufferedWriter(new FileWriter(fw,true));
+            	bw.append(nonce);
+            	bw.newLine();
+            	bw.close();
+            	
+            	serverOutput.println(message);
+            	
+            	//Construccion del Nonce de respuesta del servidor
+            	byte[] nonceBytes = new byte[32];
+                SecureRandom rand = SecureRandom.getInstance("SHA1PRNG","SUN");
+                rand.nextBytes(nonceBytes);
+                String nonce_pass = NonceGenerator.convertBytesToHex(nonceBytes);
+                serverOutput.println(nonce_pass);
+
+                // Generar la Key apartir de la clave secreta entre servidor y cliente
+                SecretKeySpec key_pass = new SecretKeySpec(SecretKey.getBytes(), "HmacSHA256");
+
+                // Cosntruimos la nueva mac
+                final Mac mac_SHA256_pass = Mac.getInstance("HmacSHA256");
+                mac_SHA256_pass.init(key_pass);
+
+                String mensajeNonce_pass = "Mensaje enviado integro " + nonce_pass;
+
+                // get the string as UTF-8 bytes
+                byte[] b_pass = mensajeNonce_pass.getBytes("UTF-8");
+
+                // create a digest from the byte array
+                byte[] digest_pass = mac_SHA256_pass.doFinal(b_pass);
+
+                String digestHex_pass = Utiles.bytesToHex(digest_pass);
+                
+                // Habría que calcular el correspondiente MAC con la clave compartida por servidor/cliente
+                serverOutput.println(digestHex_pass);
+
+                // Importante para que el mensaje se envíe
+                serverOutput.flush();
+            }else { 
+            	System.err.println("Mensaje enviado no esta integro");
+            	
+            	File fw = new File("./nonces.txt");
+                BufferedWriter bw = new BufferedWriter(new FileWriter(fw, true));
+                Date date = new Date();
+                bw.append("ERROR: " + date + "\n" + "Integrity message has been failure. Message: " + message);
+                bw.newLine();
+                bw.close();
+                
+            	//Construccion del Nonce de respuesta del servidor
+            	byte[] nonceBytes = new byte[32];
+                SecureRandom rand = SecureRandom.getInstance("SHA1PRNG","SUN");
+                rand.nextBytes(nonceBytes);
+                String nonce_pass = NonceGenerator.convertBytesToHex(nonceBytes);
+                serverOutput.println(nonce_pass);
+
+                // Generar la Key apartir de la clave secreta entre servidor y cliente
+                SecretKeySpec key_pass = new SecretKeySpec(SecretKey.getBytes(), "HmacSHA256");
+
+                //Cosntuimos la mac con el mensaje no integro interceptado
+                final Mac mac_SHA256_pass = Mac.getInstance("HmacSHA256");
+                mac_SHA256_pass.init(key_pass);
+
+                String mensajeNonce_pass = "Mensaje enviado no integro." + nonce_pass;
+
+                // get the string as UTF-8 bytes
+                byte[] b_pass = mensajeNonce_pass.getBytes("UTF-8");
+
+                // create a digest from the byte array
+                byte[] digest_pass = mac_SHA256_pass.doFinal(b_pass);
+
+                String digestHex_pass = Utiles.bytesToHex(digest_pass);
+
+                // Habría que calcular el correspondiente MAC con la clave compartida por servidor/cliente
+                System.err.println(digestHex_pass);
+
+                // Importante para que el mensaje se envíe
+                System.err.flush();
+            }
+            outputStream.close();
+            bufferedReader.close();
+            socket.close();
 
         } while (true);
     }
-
-    private Boolean nonceIsValid(String nonce) throws URISyntaxException, IOException {
-        boolean nonceValid;
-        Path path = Paths.get("./nonces.txt");
-
-        Stream<String> lines = Files.lines(path);
-        List<String> allNonces = lines.collect(Collectors.toList());
-        nonceValid = allNonces.stream().noneMatch((line) -> line.equals(nonce));
-        lines.close();
-        return nonceValid;
-    }
-
-    private void storeNonce(String nonce) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("nonces.txt", true));
-        writer.append("\n").append(nonce);
-        writer.close();
-    }
-
-    private void messageVerificationFailed(String message) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("logs.log", true));
-        writer.append("\n").append("[ERROR] Error al comprobar la integridad del mensaje: ").append(message)
-                .append("   ")
-                .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd")));
-        writer.close();
-    }
+    
+    //LOS METODOS AUXILIARES ESTAN EN UNA CLASE UTILES PARA PODER REAPROVECHARLOS EN EL CLIENTE Y NO DUPLICAR CODIGO BRO
 }
