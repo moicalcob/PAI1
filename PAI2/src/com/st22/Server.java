@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public class Server {
    
-	protected static final String SecretKey = "Secreto-ST-22";
+	protected static final String SecretKey = "Secret-ST-22";
 	protected Mac mac_cliente_SHA256;
 	
 	public static void main(String[] args) throws IOException {
@@ -60,7 +60,6 @@ public class Server {
             
             String macMensajeDelCliente = bufferedReader.readLine();
             
-            
             //Ahora se debe calcular la MAC por parte del Servidor y ver si es un mensaje integro o no 
             
             this.mac_cliente_SHA256 = Mac.getInstance("HmacSHA256");
@@ -75,10 +74,9 @@ public class Server {
             byte[] digest = this.mac_cliente_SHA256.doFinal(nonceMessageByte);
             
             String macMensajeCalculadoServ = Utiles.bytesToHex(digest);
-            FileReader linesNonce = new FileReader("./nonces.txt");
             
             //Checkeamos el nonce
-            Boolean nonceValid = Utiles.nonceIsValid(nonce);
+            boolean nonceValid = Utiles.nonceIsValid(nonce);
             if (nonceValid) {
                 Utiles.storeNonce(nonce);
                 System.out.println("Nonce v�lido");
@@ -102,30 +100,29 @@ public class Server {
             	byte[] nonceBytes = new byte[32];
                 SecureRandom rand = SecureRandom.getInstance("SHA1PRNG","SUN");
                 rand.nextBytes(nonceBytes);
-                String nonce_pass = NonceGenerator.convertBytesToHex(nonceBytes);
-                serverOutput.println(nonce_pass);
+                String noncePass = NonceGenerator.convertBytesToHex(nonceBytes);
+                serverOutput.println(noncePass);
 
                 // Generar la Key apartir de la clave secreta entre servidor y cliente
-                SecretKeySpec key_pass = new SecretKeySpec(SecretKey.getBytes(), "HmacSHA256");
+                SecretKeySpec keyPass = new SecretKeySpec(SecretKey.getBytes(), "HmacSHA256");
 
                 // Cosntruimos la nueva mac
-                final Mac mac_SHA256_pass = Mac.getInstance("HmacSHA256");
-                mac_SHA256_pass.init(key_pass);
+                this.mac_cliente_SHA256 = Mac.getInstance("HmacSHA256");
+                this.mac_cliente_SHA256.init(keyPass);
 
-                String mensajeNonce_pass = "Mensaje enviado integro " + nonce_pass;
+                String mensajeNoncePass = "Mensaje enviado integro " + noncePass;
 
                 // get the string as UTF-8 bytes
-                byte[] b_pass = mensajeNonce_pass.getBytes("UTF-8");
+                byte[] bPass = mensajeNoncePass.getBytes("UTF-8");
 
                 // create a digest from the byte array
-                byte[] digest_pass = mac_SHA256_pass.doFinal(b_pass);
+                byte[] digestPass = this.mac_cliente_SHA256.doFinal(bPass);
 
-                String digestHex_pass = Utiles.bytesToHex(digest_pass);
+                String digestHexPass = Utiles.bytesToHex(digestPass);
                 
                 // Habría que calcular el correspondiente MAC con la clave compartida por servidor/cliente
-                serverOutput.println(digestHex_pass);
-
-                // Importante para que el mensaje se envíe
+                serverOutput.println(digestHexPass);
+                // Importante para que el mensaje se envie
                 serverOutput.flush();
             }else { 
             	System.err.println("Mensaje enviado no esta integro");

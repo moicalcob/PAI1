@@ -1,2 +1,9 @@
-ERROR: Mon Apr 12 17:38:58 CEST 2021
-Integrity message has been failure. Message: Me voy ya 
+
+ERROR: Tue Apr 13 18:19:45 CEST 2021
+Integrity message has been failure. Message: Hola que tal esto es ua prueba
+ERROR: Tue Apr 13 18:22:45 CEST 2021
+Integrity message has been failure. Message: Prueba 2
+ERROR: Tue Apr 13 18:29:16 CEST 2021
+Integrity message has been failure. Message: Prueba3
+ERROR: Tue Apr 13 18:39:12 CEST 2021
+Integrity message has been failure. Message: PruebaMas

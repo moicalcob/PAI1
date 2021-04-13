@@ -37,24 +37,20 @@ public class Client {
             SecureRandom rand = SecureRandom.getInstance("SHA1PRNG","SUN");
             rand.nextBytes(nonceBytes);
             String nonce = NonceGenerator.convertBytesToHex(nonceBytes);
-
-            String message = JOptionPane.showInputDialog("Introduce los datos",JOptionPane.QUESTION_MESSAGE);
             
+            //Recogemos el mensaje
+            String message = JOptionPane.showInputDialog("Introduce los datos",JOptionPane.QUESTION_MESSAGE);
             
             //Construimos la clave con el SecretKey Cliente-Servidor
             SecretKeySpec key = new SecretKeySpec(SecretKey.getBytes(),"HmacSHA256");
-            
             this.mac_cliente_SHA256 = Mac.getInstance("HmacSHA256");
             this.mac_cliente_SHA256.init(key);
             
             String nonceMessage = message + nonce; 
-            
             byte[] nonceMessageBytes = nonceMessage.getBytes("UTF-8");
-            
             byte[] digest = this.mac_cliente_SHA256.doFinal(nonceMessageBytes);
             
             String digestHexadecimal = Utiles.bytesToHex(digest);
-            System.out.println("MENSAJE ENVIADO: ".concat(message).concat(" NONCE ENVIADO: ").concat(nonce).concat("NONCE MESSAGE: ").concat(nonceMessage));
             clientOutput.println(message);
             clientOutput.println(nonce);
             clientOutput.println(digestHexadecimal);
@@ -68,27 +64,21 @@ public class Client {
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(client.getInputStream()));    
         
         String mensajeRecibido = inputStream.readLine();
-        String nonceRecibido = inputStream.readLine(); 
-        
+        String nonceRecibido = inputStream.readLine();         
         String macRecibida = inputStream.readLine();
-        System.out.println("MENSAJE RECIBIDO: ".concat(mensajeRecibido).concat(" NONCE RECIBIDO: ").concat(nonceRecibido).concat("MAC RECIBIDA: ").concat(macRecibida));
+       
         this.mac_cliente_SHA256 = Mac.getInstance("HmacSHA256");
         SecretKeySpec keyVerification = new SecretKeySpec(SecretKey.getBytes(), "HmacSHA256");
-        
         this.mac_cliente_SHA256.init(keyVerification);
         
-        String nonceMessageServer = mensajeRecibido + nonceRecibido;
         
+        String nonceMessageServer = "Mensaje enviado integro " + nonceRecibido;
         byte[] nonceMessageRecivedBytes = nonceMessageServer.getBytes("UTF-8");
-        
         byte[] digestServer = this.mac_cliente_SHA256.doFinal(nonceMessageRecivedBytes);
-            
         String messageMacCalculated = Utiles.bytesToHex(digestServer);
         
         FileReader noncesSaved = new FileReader("./nonce_client.txt");
-        System.out.println("MENSAJE RECIBIDO: ".concat(mensajeRecibido).concat(" NONCE RECIBIDO: ").concat(nonceRecibido).concat("DIGEST RECIBIDA: ").concat(messageMacCalculated));
-        Boolean nonceValid = true;
-        
+        Boolean nonceValid = true;        
         try (BufferedReader br = new BufferedReader(noncesSaved)) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -97,7 +87,7 @@ public class Client {
                 }
             }
         }
-        
+        //Si las "macs" son iguales y el nonce es valido es decir no ha sido utilizado con anterioridad se guarda este Nonce nuevo y todo correcto
         if(macRecibida.equals(messageMacCalculated) && nonceValid) {
             JOptionPane.showMessageDialog(null, mensajeRecibido);
             
@@ -106,9 +96,8 @@ public class Client {
             bw.append(nonce);
             bw.newLine();
             bw.close();
-        }else { 
+        }else { //En caso contrario lo que se realiza es que se gauarda en un archivo de Logs la Fecha y el fallo en el mensaje. 
         	JOptionPane.showMessageDialog(null, mensajeRecibido);
-
             File fw = new File("./logFile_client.txt");
             BufferedWriter bw = new BufferedWriter(new FileWriter(fw, true));
             Date date = new Date();
@@ -116,7 +105,6 @@ public class Client {
             bw.newLine();
             bw.close();
         }
-        
         clientOutput.close();
         inputStream.close();
         client.close();
