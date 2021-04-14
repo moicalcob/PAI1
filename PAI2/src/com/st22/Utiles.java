@@ -1,8 +1,6 @@
 package com.st22;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,10 +44,46 @@ public class Utiles {
     }
 
     public static void messageVerificationFailed(String message) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("logs.log", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("logs.txt", true));
         writer.append("\n").append("[ERROR] Error al comprobar la integridad del mensaje: ").append(message)
                 .append("   ")
                 .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd")));
         writer.close();
+    }
+
+    public static void saveTransaction(String message) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.txt", true));
+        writer.append("\n").append("[DONE] Transacción realizada: ").append(message)
+                .append("   ")
+                .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd")));
+        writer.close();
+    }
+
+    public static double getKpi() throws IOException {
+        return (double) getNumTransactionsOk() / (getNumTransactionsWrong() + getNumTransactionsOk());
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    public static Integer getNumTransactionsOk() throws IOException {
+        LineNumberReader reader  = new LineNumberReader(new FileReader("./transactions.txt"));
+        int cnt = 0;
+        String lineRead = "";
+        while ((lineRead = reader.readLine()) != null) {}
+
+        cnt = reader.getLineNumber();
+        reader.close();
+        return cnt - 1;
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    public static Integer getNumTransactionsWrong() throws IOException {
+        LineNumberReader reader  = new LineNumberReader(new FileReader("./logs.txt"));
+        int cnt = 0;
+        String lineRead = "";
+        while ((lineRead = reader.readLine()) != null) {}
+
+        cnt = reader.getLineNumber();
+        reader.close();
+        return cnt - 1;
     }
 }
