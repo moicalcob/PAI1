@@ -1,0 +1,4 @@
+
+[DONE] Transacción realizada: FROM: ES01 - TO: ES99 -> 100€   15:45:07 2021-04-14
+[DONE] Transacción realizada: FROM: ES01 - TO:  ES02 -> 20€   15:56:30 2021-04-14
+[DONE] Transacción realizada: FROM: ST22 - TO: ST23 -> 55€   15:57:26 2021-04-14

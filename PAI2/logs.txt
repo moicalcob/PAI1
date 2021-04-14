@@ -1,2 +1,0 @@
-
-[ERROR] Error al comprobar la integridad del mensaje: FROM: ES00 - TO: ES99 -> 200€   01:52:44 2021-04-14

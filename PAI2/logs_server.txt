@@ -1,0 +1,4 @@
+
+[ERROR] Error al comprobar la integridad del mensaje: FROM: NONCE_MAL - TO: NONCE_NON_VALID -> 100€   15:47:58 2021-04-14
+[ERROR] Error al comprobar la integridad del mensaje: FROM: CLAVE_MAL - TO: CLAVE_MAL -> 50€ NONCE_NON_VALID    15:53:42 2021-04-14
+[ERROR] Error al comprobar la integridad del mensaje: FROM: SECRET_MAL - TO: SECRET_MAL -> 1000€ MAC_VERIFICATION_FAILED    15:54:57 2021-04-14

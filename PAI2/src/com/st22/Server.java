@@ -22,8 +22,6 @@ public class Server {
     public static void main(String[] args) throws IOException {
         try {
             Server server = new Server();
-            double kpi = Utiles.getKpi();
-            System.out.println(kpi * 100 + "% de transacciones íntegras");
             server.startServer();
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -41,6 +39,8 @@ public class Server {
     private void startServer() throws IOException, URISyntaxException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
         do {
             System.err.println("Servidor configurado correctamente");
+            double kpi = Utiles.getKpi();
+            System.out.println(kpi * 100 + "% de transacciones íntegras");
             Socket socket = server.accept();
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             PrintWriter serverOutput = new PrintWriter(outputStream, true);
@@ -73,7 +73,7 @@ public class Server {
                 System.out.println("Nonce válido");
                 System.out.println("Cifrado hex: " + macMensajeDelCliente);
             } else {
-                Utiles.messageVerificationFailed(message);
+                Utiles.messageVerificationFailed(message + " NONCE_NON_VALID ");
                 System.out.println("Nonce no válido");
             }
 
@@ -107,10 +107,10 @@ public class Server {
                 serverOutput.println(digestHexPass);
                 // Importante para que el mensaje se envie
                 serverOutput.flush();
-            } else {
+            } else if (nonceValid) {
                 System.err.println("Mensaje enviado no esta integro");
 
-                Utiles.messageVerificationFailed(message);
+                Utiles.messageVerificationFailed(message + " MAC_VERIFICATION_FAILED ");
 
                 //Construccion del Nonce de respuesta del servidor
                 byte[] nonceBytes = new byte[32];

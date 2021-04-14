@@ -36,6 +36,8 @@ public class Client {
             rand.nextBytes(nonceBytes);
             String nonce = NonceGenerator.convertBytesToHex(nonceBytes);
 
+            //String nonce = "793ffb67c9ca8e3698288d15240597082d95093c144b91c6e5da658b16ca0f83";
+
             JTextField origin = new JTextField(5);
             JTextField target = new JTextField(5);
             JTextField quantity = new JTextField(5);

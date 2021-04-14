@@ -28,7 +28,7 @@ public class Utiles {
     
     public static Boolean nonceIsValid(String nonce) throws URISyntaxException, IOException {
         boolean nonceValid;
-        Path path = Paths.get("./nonces.txt");
+        Path path = Paths.get("./nonces_server.txt");
 
         Stream<String> lines = Files.lines(path);
         List<String> allNonces = lines.collect(Collectors.toList());
@@ -38,13 +38,13 @@ public class Utiles {
     }
 
     public static void storeNonce(String nonce) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("nonces.txt", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("nonces_server.txt", true));
         writer.append("\n").append(nonce);
         writer.close();
     }
 
     public static void messageVerificationFailed(String message) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("logs.txt", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("logs_server.txt", true));
         writer.append("\n").append("[ERROR] Error al comprobar la integridad del mensaje: ").append(message)
                 .append("   ")
                 .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd")));
@@ -52,7 +52,7 @@ public class Utiles {
     }
 
     public static void saveTransaction(String message) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.txt", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("transactions_server.txt", true));
         writer.append("\n").append("[DONE] Transacción realizada: ").append(message)
                 .append("   ")
                 .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd")));
@@ -60,12 +60,15 @@ public class Utiles {
     }
 
     public static double getKpi() throws IOException {
-        return (double) getNumTransactionsOk() / (getNumTransactionsWrong() + getNumTransactionsOk());
+        if(getNumTransactionsOk() > 0) {
+            return (double) getNumTransactionsOk() / (getNumTransactionsWrong() + getNumTransactionsOk());
+        }
+        return 0;
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     public static Integer getNumTransactionsOk() throws IOException {
-        LineNumberReader reader  = new LineNumberReader(new FileReader("./transactions.txt"));
+        LineNumberReader reader  = new LineNumberReader(new FileReader("./transactions_server.txt"));
         int cnt = 0;
         String lineRead = "";
         while ((lineRead = reader.readLine()) != null) {}
@@ -77,7 +80,7 @@ public class Utiles {
 
     @SuppressWarnings("StatementWithEmptyBody")
     public static Integer getNumTransactionsWrong() throws IOException {
-        LineNumberReader reader  = new LineNumberReader(new FileReader("./logs.txt"));
+        LineNumberReader reader  = new LineNumberReader(new FileReader("./logs_server.txt"));
         int cnt = 0;
         String lineRead = "";
         while ((lineRead = reader.readLine()) != null) {}
