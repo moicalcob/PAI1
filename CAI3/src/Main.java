@@ -1,5 +1,6 @@
 import encryption.AES_CBC_128;
 import encryption.BLOWFISH;
+import encryption.AES192OFB;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,6 +16,7 @@ public class Main {
 
         System.out.println("1: Encriptar con BLOWFISH");
         System.out.println("2: Encriptar con AES_CBC_128");
+        System.out.println("3: Encriptar con AES_OFB_192");
         System.out.println("0: Exit");
 
         while (true) {
@@ -30,11 +32,17 @@ public class Main {
                     String encryptedAES_CBC_128Image = AES_CBC_128.runAES_CBC_128();
                     writeEncryptedFile(encryptedAES_CBC_128Image, "AES_CBC_128_image.txt");
                     break;
+                case '3' : 
+                	System.out.println("Encriptando con AES_OFB_192");
+                	String encryptedAES_OFB_192Image = AES192OFB.runAES192OFB();
+                	writeEncryptedFile(encryptedAES_OFB_192Image, "AES_OFB_192_image.txt");
+                	break;
                 case '0':
                     System.exit(0);
                     break;
                 default:
             }
+            break;
         }
     }
 

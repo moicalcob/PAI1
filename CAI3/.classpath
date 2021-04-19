@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/amine/Downloads/commons-codec-1.15.jar"/>
+	<classpathentry kind="lib" path="C:/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/CUARTO DE CARRERA/SSI/ssii-master/CAI/cai4/code/requiredJars/commons-io-2.6-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/CUARTO DE CARRERA/SSI/ssii-master/CAI/cai4/code/requiredJars/commons-io-2.6-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/CUARTO DE CARRERA/SSI/ssii-master/CAI/cai4/code/requiredJars/commons-io-2.6-tests.jar"/>
+	<classpathentry kind="lib" path="C:/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/CUARTO DE CARRERA/SSI/ssii-master/CAI/cai4/code/requiredJars/commons-io-2.6-test-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/amine/OneDrive - UNIVERSIDAD DE SEVILLA/CUARTO DE CARRERA/SSI/iaik.jar"/>
+	<classpathentry kind="output" path="out/production/CAI3"/>
+</classpath>
