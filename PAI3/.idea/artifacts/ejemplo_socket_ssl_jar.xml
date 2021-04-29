@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ejemplo-socket-ssl:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ejemplo_socket_ssl_jar</output-path>
+    <root id="archive" name="ejemplo-socket-ssl.jar">
+      <element id="module-output" name="PAI3" />
+    </root>
+  </artifact>
+</component>
