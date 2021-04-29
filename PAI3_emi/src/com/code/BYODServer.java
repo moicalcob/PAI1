@@ -17,24 +17,24 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 public class BYODServer {
 	
-	private SSLServerSocket serverSocker; 
+	private final SSLServerSocket serverSocket;
 	private static final String[] protocols = new String[] {"TLSv1.3"};
 	private static final String[] chiperSuits = new String[] {"TLS_AES_128_GCM_SHA256"};
 	
 	
 	public BYODServer() throws Exception { 
 		SSLServerSocketFactory sockFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-		this.serverSocker = (SSLServerSocket) sockFactory.createServerSocket(8080);
-		serverSocker.setEnabledProtocols(protocols);
-		serverSocker.setEnabledCipherSuites(chiperSuits);
+		this.serverSocket = (SSLServerSocket) sockFactory.createServerSocket(8080);
+		serverSocket.setEnabledProtocols(protocols);
+		serverSocket.setEnabledCipherSuites(chiperSuits);
 	}
 	
 	public void runServer() throws IOException { 
 		while(true) {
-			//Esperamos hasta que recibimos alguna petición desde el cliente
+			//Esperamos hasta que recibimos alguna peticiï¿½n desde el cliente
 			try { 
 				System.err.println("Esperando conexiones por parte de los clientes");
-				Socket socket = (Socket) serverSocker.accept();
+				Socket socket = (Socket) serverSocket.accept();
 				
 				//Abrimos un BufferReader para leer los datos de los clientes
 				BufferedReader inputServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -58,7 +58,7 @@ public class BYODServer {
 				}
 				
 				if(!userValid) { 
-					outputServer.println("Lo siento, según la solución del Security Team 22 su nombre de usuario o contraseña no son correctos, intentelo de nuevo");
+					outputServer.println("Lo siento, segÃºn la soluciÃ³n del Security Team 22 su nombre de usuario o contraseÃ±a no son correctos, intentelo de nuevo");
 				} else { 
 					File archivo = new File("messages.txt");
 					BufferedWriter bWriter = new BufferedWriter(new FileWriter(archivo, true));
