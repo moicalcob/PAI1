@@ -89,19 +89,15 @@ public class Server {
 
 					boolean verified = verificaFirmaDigital(values, firma, str_firma);
 
-					if (verified) {
-						String[] allvalues = values.split(",");
-						Integer mesas = Integer.parseInt(allvalues[0]);
-						Integer sillas = Integer.parseInt(allvalues[1]);
-						Integer sillones = Integer.parseInt(allvalues[2]);
-						Integer camas = Integer.parseInt(allvalues[3]);
-						Integer usuario = Integer.parseInt(allvalues[4]);
+					String[] allvalues = values.split(",");
+					Integer mesas = Integer.parseInt(allvalues[0]);
+					Integer sillas = Integer.parseInt(allvalues[1]);
+					Integer sillones = Integer.parseInt(allvalues[2]);
+					Integer camas = Integer.parseInt(allvalues[3]);
+					Integer usuario = Integer.parseInt(allvalues[4]);
 
-						bbdd.insertOrder(mesas, sillas, sillones, camas, usuario, verified);
-						bbdd.generateLog();
-					} else {
-						System.out.println("La verificación ha fallado");
-					}
+					bbdd.insertOrder(mesas, sillas, sillones, camas, usuario, verified);
+					bbdd.generateLog();
 
 				} else {
 					System.out.println("Ha superado el número máximo de intentos");
