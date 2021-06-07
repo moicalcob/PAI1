@@ -87,7 +87,12 @@ public class Server {
 				System.out.println("OV: " + overload);
 				if (!overload) {
 
-					boolean verified = verificaFirmaDigital(values, firma, str_firma);
+					boolean verified;
+					try {
+						verified = verificaFirmaDigital(values, firma, str_firma);
+					} catch (Exception e) {
+						verified = false;
+					}
 
 					String[] allvalues = values.split(",");
 					Integer mesas = Integer.parseInt(allvalues[0]);

@@ -5,12 +5,13 @@ FLUSH PRIVILEGES;
 CREATE DATABASE mobifirma;
 
 CREATE TABLE pedidos (
+    id SERIAL PRIMARY KEY,
     usuario int,
     mesas int,
     sillas int,
     camas int,
     sillones int,
     fecha DATETIME,
-    tiempo TIMESTAMP,
+    hora TIMESTAMP,
     accepted boolean
 );

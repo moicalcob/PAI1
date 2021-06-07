@@ -16,7 +16,7 @@ public class BBDDAccess {
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
 
-	final private String host = "localhost:3306";
+	final private String host = "127.0.0.1:33306";
 	final private String user = "mobifirma";
 	final private String password = "ST22-MobiFirma";
 
@@ -70,11 +70,12 @@ public class BBDDAccess {
 			String sillones = resultSet.getString("sillones");
 			String mesas = resultSet.getString("mesas");
 			Boolean accepted = resultSet.getBoolean("accepted");
-			PrintWriter writer = new PrintWriter("LOG - P" + id + " - " + date + ".txt", "UTF-8");
+			PrintWriter writer = new PrintWriter("log-order-" + id + " - " + date + ".log", "UTF-8");
 
-			writer.println("///////PEDIDO NUMERO " + id + "///////////");
-			writer.println("TENDENCIA ACTUAL: " + tendencia);
-			writer.println("ULTIMO PEDIDO: ");
+			writer.println("--------------------------------------");
+			writer.println("Número de pedido: " + id);
+			writer.println("Tendencia : " + tendencia);
+			writer.println("Contenido: ");
 			writer.println("	Usuario: " + usuario);
 			writer.println("	Fecha: " + date);
 			writer.println("	Camas: " + camas);
@@ -82,7 +83,7 @@ public class BBDDAccess {
 			writer.println("	Sillones: " + sillones);
 			writer.println("	Mesas: " + mesas);
 			writer.println("	Aprobado: " + accepted);
-			writer.println("//////////");
+			writer.println("--------------------------------------");
 			writer.close();
 		}
 	}
@@ -102,7 +103,7 @@ public class BBDDAccess {
 	}
 
 	public boolean checkConnectionLimit() throws Exception {
-		Class.forName("com.mysql.jdbc.Driver");
+		Class.forName("com.mysql.cj.jdbc.Driver");
 
 		connect = DriverManager
 				.getConnection("jdbc:mysql://" + host + "/mobifirma?" + "user=" + user + "&password=" + password);
